@@ -1,0 +1,12 @@
+extends ../layouts/auth_template
+
+block content
+  .container
+    form.form-signin(action="/user", method="post")
+      h2.form-signin-heading New User
+      //- input.form-control(type='email',name="email",placeholder='Email address',required,autofocus)
+      //- input.form-control(type='password',name="password",placeholder='password',required)
+      input.form-control#email(type='text', name="email", placeholder='Email', value=user.email)
+      input.form-control#username(type='text', name="username", placeholder='Username', value=user.username)
+      input.form-control#password(type='password', name="password", placeholder='Password')
+      button.btn.btn-lg.btn-primary.btn-block(type='submit') Sign up

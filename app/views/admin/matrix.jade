@@ -1,0 +1,64 @@
+extends ../layouts/flat_template
+
+block content
+  .container
+    .row
+      ul.nav.nav-tabs
+        li
+          a(href='/users') 帐号管理
+        li
+          a(href='/clients') 客户信息管理
+        li
+          a(href='/roles') 角色管理
+        li.active
+          a(href='/matrix') 权限管理
+  .container
+    .row
+      h2 许可管理
+      //- p #{roles}
+      //- p #{permits}
+      table.table.table-condensed.table-responsive.table-striped
+        thead
+          td
+          for permit in permits
+            td=permit.permitname
+        tbody
+          for role in roles
+            tr
+              td
+                span.span-rolename(data-role-id='#{role._id}') #{role.rolename}
+              for permit in permits
+                td
+                  if _.find(role.permits,permit._id)
+                    input(class='cb_marix_item_#{role._id}',type="checkbox",data-role-id="#{role._id}",data-permit-id="#{permit._id}", checked='true')
+                  else
+                    input(class='cb_marix_item_#{role._id}',type="checkbox",data-role-id="#{role._id}",data-permit-id="#{permit._id}")
+                    
+      button.btn.btn-primary#save_matrix_btn Save
+      button.btn.btn-default Cancel
+block customescript
+   script.
+    $(function(){
+      $('#save_matrix_btn').click(function(e){
+        var span_rolenames=$('.span-rolename');
+        var docs=[];
+        $.each(span_rolenames,function(index,role){
+          var role_id=$(role).data('role-id');
+          var role_cb_target=".cb_marix_item_"+role_id;
+          var role_boxes=$(role_cb_target);
+          var role_item={};
+          var gotpermits=[];
+          $.each(role_boxes,function(index,permit){
+            var permit_id=$(permit).data('permit-id');
+            if($(permit).prop('checked')){
+              gotpermits.push(permit_id);
+            }
+          });
+          role_item={_id:role_id,permits:gotpermits};
+          docs.push(role_item);
+        });
+        $.post('/matrix',{docs:docs},function(){
+          window.location.reload();
+        });
+      });
+    });

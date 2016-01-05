@@ -1,0 +1,10 @@
+extends layouts/flat_template
+
+block content
+  include contents/home
+
+block customescript
+   script.
+    $(function(){
+     console.log('page loading');
+    });

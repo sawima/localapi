@@ -1,0 +1,137 @@
+extends ../layouts/flat_template
+
+block content
+  .container
+    .row
+      ul.nav.nav-tabs
+        li
+          a(href='/users') 帐号管理
+        li.active
+          a(href='/clients') 客户信息管理
+        li
+          a(href='/roles') 角色管理
+        li
+          a(href='/matrix') 权限管理
+  .container.margin-bottom-40.margin-top-20
+    a.btn.btn-default(href='/client')
+      i.fa.fa-user-plus
+      | 新增客户
+    //- a.btn.btn-default(type='button',data-toggle='modal',data-target='#newClient') 
+    //-   i.fa.fa-user-plus
+    //-   | 新增客户
+    //- .modal#newClient(tabindex="-1",role="dialog",aria-labelledby="newClientLabel",aria-hidden='true')
+    //-   .modal-dialog
+    //-     .modal-content
+    //-       .modal-header
+    //-         button.close(type='button',data-dismiss='modal',aria-label='Close')
+    //-           span(aria-hidden='true') &times;
+    //-         h4.modal-title 新客户
+    //-       .modal-body
+    //-         form.form-horizontal(method="POST", action="/postNewClient",enctype='application/x-www-form-urlencoded')
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 公司名称
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='公司名称')
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 公司地址
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='公司地址')
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 电话
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='电话')
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 传真
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='传真')
+    //-           hr
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 联系人
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='联系人')
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 邮箱
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='邮箱')
+    //-           .form-group
+    //-             label.col-sm-2.control-label(for="companyname") 电话
+    //-             .col-sm-10
+    //-               input.form-control(type='text',name='companyname',placeholder='电话')
+    //-           .form-group
+    //-             .col-sm-10.col-sm-offset-2
+    //-               button.btn.btn-primary(type='submit') 保存
+    //-       .modal-footer
+    //-         button.btn.btn-default.btn-lg(data-dismiss="modal") 关闭
+    hr.hr-xs
+    table#clients_table.display(cellspacing='0', width='100%')
+      thead
+        tr
+          th 公司名称
+          th 公司地址
+          th 电话
+          th 传真
+          th 联系人
+          th 联系人邮箱
+          th 联系人电话
+      //- tfoot
+      //-   tr
+      //-     th Name
+      //-     th Position
+      //-     th Office
+      //-     th Age
+      //-     th Start date
+      //-     th Salary
+      tbody
+        each client in clients
+          tr
+            td
+              a(href='/client/#{client._id}') #{client.companyname} 
+            td=client.address
+            td=client.phone
+            td=client.fax
+            td=client.keyperson
+            td=client.keyperson_email
+            td=client.keyperson_phone
+            //- td
+            //-   a.btn.btn-info.btn-xs(href="#") edit
+
+block customescript
+  script(type='text/javascript', src='/libs/datatables/media/js/jquery.dataTables.min.js')
+  script.
+    $(function(){
+     $('#clients_table').DataTable({
+        lengthChange:false,
+        info:false,
+        pageLength:50,
+        "language":{
+          "sProcessing":   "处理中...",
+          "sLengthMenu":   "显示 _MENU_ 项结果",
+          "sZeroRecords":  "没有匹配结果",
+          "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+          "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+          "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+          "sInfoPostFix":  "",
+          "sSearch":       "搜索:",
+          "sUrl":          "",
+          "sEmptyTable":     "表中数据为空",
+          "sLoadingRecords": "载入中...",
+          "sInfoThousands":  ",",
+          "oPaginate": {
+            "sFirst":    "首页",
+            "sPrevious": "上页",
+            "sNext":     "下页",
+            "sLast":     "末页"
+          },
+          "oAria": {
+            "sSortAscending":  ": 以升序排列此列",
+            "sSortDescending": ": 以降序排列此列"
+          }
+        }
+      });
+      $("[name='my-checkbox']").bootstrapSwitch({
+        size:"mini",
+        onText:"启用",
+        offText:'禁用',
+        offColor:"danger"
+      });
+    });

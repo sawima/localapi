@@ -1,0 +1,29 @@
+extends ../layouts/auth_template
+
+block content
+  form.form-login(method='post')
+    h2.form-login-heading 请登录
+    .login-wrap
+      .form-group
+        label(for='email') 邮箱
+        input.form-control(type='email',name="email" placeholder='邮箱', autofocus='',required)
+      .form-group
+        label(for='email') 密码
+        input.form-control(type='password',name='password' placeholder='密码',required)
+      label.checkbox
+        span.pull-right
+          a(href='/forgot')  忘记密码?
+      button.btn.btn-theme.btn-block(type='submit')
+        i.fa.fa-lock
+        |  登录
+      hr
+      .registration
+        //- | Don't have an account yet?
+        //- br
+        a(href='/applyaccount')
+          | 申请帐号
+    include ../partials/flash
+block customescript
+  script(src='/libs/jquery-backstretch/jquery.backstretch.min.js')
+  script.
+    $.backstretch("/images/bg/login.jpg",{speed:500});

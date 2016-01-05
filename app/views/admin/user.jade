@@ -1,0 +1,113 @@
+extends ../layouts/flat_template
+
+block content
+  .container
+    .row
+      ul.nav.nav-tabs
+        li.active
+          a(href='/users') 帐号管理
+        li
+          a(href='/clients') 客户信息管理
+        li
+          a(href='/roles') 角色管理
+        li
+          a(href='/matrix') 权限管理
+  .container
+    - var editable = account._id?true:false;
+    form.form-horizontal(method="POST", action=editable?"/user/#{account._id}":"/user",enctype='application/x-www-form-urlencoded')
+      if editable
+        input(type='hidden',name='_method',value='PUT')
+        input(type='hidden',id='hidden_uid',value='#{account._id}')
+        h4 编辑用户信息
+      else
+        h4 添加新用户
+      .form-group
+        label.col-sm-2.control-label(for="companyname") 姓名
+        .col-sm-10
+          input.form-control(type='text',name='username',value="#{account.username || ''}",placeholder='姓名')
+      .form-group
+        label.col-sm-2.control-label(for="address") 邮箱
+        .col-sm-10
+          input.form-control(type='email',name='email',value="#{account.email || ''}",placeholder='邮箱')
+      .form-group
+        label.col-sm-2.control-label(for="phone") 电话
+        .col-sm-10
+          input.form-control(type='text',name='phone',value="#{account.phone || ''}",placeholder='电话')
+      .form-group
+        label.col-sm-2.control-label(for="client") 公司
+        .col-sm-10
+          - var clientId=account.client?account.client._id:null
+          select.form-control(name='client',required)
+            option(value="")
+            for client in clients
+              if String(client._id)==String(clientId)
+                option(value=client._id,selected="true") #{client.companyname}
+              else
+                option(value=client._id) #{client.companyname}
+      .form-group
+        label.col-sm-2.control-label(for="client") 角色
+        .col-sm-10
+          if editable
+            - var arrayofdefinedid=_.pluck(account.roles,'_id');
+            - var undefinedroles=_.filter(roles,function (role) {return !_.find(arrayofdefinedid,role._id);});
+            select.form-control(name='roles',multiple='multiple',size=5)
+              for role in account.roles
+                option(value=role._id,selected='true') #{role.rolename}
+              for role in undefinedroles
+                option(value=role._id) #{role.rolename}
+          else
+            select.form-control(name='roles',multiple='multiple',size=5)
+              for role in roles
+                option(value=role._id) #{role.rolename}
+                
+
+      .form-group
+        .col-sm-10.col-sm-offset-2
+          //- p #{account}
+          //- p #{clients}
+          //- p #{roles}
+      .form-group
+        .col-sm-10.col-sm-offset-2
+          if editable
+            #edit_btn_group
+              a.btn.btn-primary(href='#',id='edit_btn')
+                i.fa.fa-edit
+                | 编辑
+              a.btn.btn-default(href='/users')
+                i.fa.fa-recycle
+                | 返回
+            #update_btn_group(style='display:none;')
+              button.btn.btn-primary(type='submit') 
+                i.fa.fa-refresh
+                | 更新
+              a.btn.btn-default#cancel_update_btn(href="#")
+                i.fa.fa-recycle
+                | 取消
+          else
+            button.btn.btn-primary.col-sm-2(type='submit') 
+              i.fa.fa-save
+              | 保存
+            a.btn.btn-default.col-sm-2(href='/users')
+              i.fa.fa-recycle
+              | 返回
+block customescript
+   script.
+    $(function(){
+      var user_id=$('#hidden_uid').val();
+      if(user_id && user_id.length){
+        $('.form-control').prop("disabled",true);
+      }
+      $('#edit_btn').click(function(e){
+        e.preventDefault();
+        $('#update_btn_group').toggle();
+        $(this).parent().toggle();
+        $('.form-control').prop("disabled",false);
+      });
+
+      $('#cancel_update_btn').click(function(e){
+        e.preventDefault();
+        $(this).parent().toggle();
+        $('#edit_btn_group').toggle();
+        $('.form-control').prop("disabled",true);
+      })
+    });

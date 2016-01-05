@@ -1,0 +1,97 @@
+extends ../layouts/flat_template
+
+block content
+  .container
+    ul.nav.nav-tabs
+      li
+        a(href='/users') 帐号管理
+      li.active
+        a(href='/clients') 客户信息管理
+      li
+        a(href='/roles') 角色管理
+      li
+        a(href='/matrix') 权限管理
+  .container
+    - var editable = client._id?true:false;
+    form.form-horizontal(method="POST", action=editable?"/client/#{client._id}":"/client",enctype='application/x-www-form-urlencoded')
+      if editable
+        input(type='hidden',name='_method',value='PUT')
+        input(type='hidden',id='hidden_cid',value='#{client._id}')
+        h4 编辑客户信息
+      else
+        h4 添加新客户
+      .form-group
+        label.col-sm-2.control-label(for="companyname") 公司名称
+        .col-sm-10
+          input.form-control(type='text',name='companyname',value="#{client.companyname || ''}",placeholder='公司名称')
+      .form-group
+        label.col-sm-2.control-label(for="address") 公司地址
+        .col-sm-10
+          input.form-control(type='text',name='address',value="#{client.address || ''}",placeholder='公司地址')
+      .form-group
+        label.col-sm-2.control-label(for="phone") 电话
+        .col-sm-10
+          input.form-control(type='text',name='phone',value="#{client.phone || ''}",placeholder='电话')
+      .form-group
+        label.col-sm-2.control-label(for="fax") 传真
+        .col-sm-10
+          input.form-control(type='text',name='fax',value="#{client.fax || ''}",placeholder='传真')
+      hr
+      .form-group
+        label.col-sm-2.control-label(for="keyperson") 联系人
+        .col-sm-10
+          input.form-control(type='text',name='keyperson',value="#{client.keyperson || ''}",placeholder='联系人')
+      .form-group
+        label.col-sm-2.control-label(for="keyperson_email") 邮箱
+        .col-sm-10
+          input.form-control(type='email',name='keyperson_email',value="#{client.keyperson_email || ''}",placeholder='邮箱')
+      .form-group
+        label.col-sm-2.control-label(for="keyperson_phone") 电话
+        .col-sm-10
+          input.form-control(type='text',name='keyperson_phone',value="#{client.keyperson_phone || ''}",placeholder='电话')
+      .form-group
+        .col-sm-10.col-sm-offset-2
+          if editable
+            #edit_btn_group
+              a.btn.btn-primary(href='#',id='edit_btn')
+                i.fa.fa-edit
+                | 编辑
+              a.btn.btn-default(href='/clients')
+                i.fa.fa-recycle
+                | 返回
+            #update_btn_group(style='display:none;')
+              button.btn.btn-primary(type='submit') 
+                i.fa.fa-refresh
+                | 更新
+              a.btn.btn-default#cancel_update_btn(href="#")
+                i.fa.fa-recycle
+                | 取消
+          else
+            button.btn.btn-primary.col-sm-2(type='submit') 
+              i.fa.fa-save
+              | 保存
+            a.btn.btn-default.col-sm-2(href='/client')
+              i.fa.fa-recycle
+              | 返回
+block customescript
+   script.
+    $(function(){
+      var client_id=$('#hidden_cid').val();
+      if(client_id && client_id.length){
+        $('.form-control').prop("disabled",true);
+      }
+
+      $('#edit_btn').click(function(e){
+        e.preventDefault();
+        $('#update_btn_group').toggle();
+        $(this).parent().toggle();
+        $('.form-control').prop("disabled",false);
+      });
+
+      $('#cancel_update_btn').click(function(e){
+        e.preventDefault();
+        $(this).parent().toggle();
+        $('#edit_btn_group').toggle();
+        $('.form-control').prop("disabled",true);
+      })
+    });

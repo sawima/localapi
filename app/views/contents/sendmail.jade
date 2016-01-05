@@ -1,0 +1,21 @@
+extends ../layouts/flat_template
+
+block content
+  .row
+    .col-md-6
+      form(method='post',action="/sendmail")
+        legend Form Legend
+        .form-group
+          label(for='exampleInputEmail1') Email address
+          input#exampleInputEmail1.form-control(type='email', placeholder='Enter email')
+        .form-group
+          label(for='exampleInputPassword1') Password
+          input#exampleInputPassword1.form-control(type='password', placeholder='Password')
+        button.btn.btn-default(type='submit') Submit
+
+
+block customescript
+   script.
+    $(function(){
+     console.log('send mail');
+    });

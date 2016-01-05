@@ -1,0 +1,77 @@
+extends ../layouts/flat_template
+
+block content
+  .container
+    .row
+      ul.nav.nav-tabs
+        li
+          a(href='/users') 帐号管理
+        li
+          a(href='/clients') 客户信息管理
+        li.active
+          a(href='/roles') 角色管理
+        li
+          a(href='/matrix') 权限管理
+  .container
+    .row
+      h2 角色管理
+      each role in roles
+        ul.list-unstyled
+          li 
+            a.btn.btn-danger.btn-xs.remove-role-btn(href='#',data-role-id="#{role._id}")
+              i.fa.fa-trash-o
+            | #{role.rolename} 
+            //- a(href='#',data-role-id=role._id,data-toggle='modal',data-target='#newUser') #{role.rolename}
+      .row
+        .col-md-6
+          form(method="POST", action="/role")
+            .input-group
+              input.form-control(type='text',name='rolename',placeholder='新角色')
+              span.input-group-btn
+                button.btn.btn-primary(type='submit') 新角色
+  //- .modal#newUser(tabindex="-1",role="dialog",aria-labelledby="newUserLabel",aria-hidden='true')
+  //-   .modal-dialog
+  //-     .modal-content
+  //-       .modal-header
+  //-         button.close(type='button',data-dismiss='modal',aria-label='Close')
+  //-           span(aria-hidden='true') &times;
+  //-         h4.modal-title 角色管理
+  //-       .modal-body
+  //-         .row
+  //-           .col-sm-5
+  //-             select.form-control#usersList(multiple='multiple',size=20)
+  //-               for user in users 
+  //-                 option(value=user._id) #{user.username}
+  //-           .col-sm-2
+  //-             button.btn.btn-block.btn-info#btnRight
+  //-               i.fa.fa-angle-double-right 
+  //-             button.btn.btn-block.btn-info#btnLeft
+  //-               i.fa.fa-angle-double-left 
+  //-           .col-sm-5
+  //-             select.form-control#addedUsersList(multiple='multiple',size=20)
+  //-       .modal-footer
+  //-         button.btn.btn-default(data-dismiss="modal") 关闭
+  //-         button.btn.btn-primary#save_role_users_btn 保存修改
+block customescript
+  script.
+    $(function(){
+      $("#btnLeft").click(function () {
+        var selectedItem = $("#addedUsersList option:selected");
+        $("#usersList").append(selectedItem);
+      });
+
+      $("#btnRight").click(function () {
+        var selectedItem = $("#usersList option:selected");
+        $("#addedUsersList").append(selectedItem);
+      });
+      
+      $('.remove-role-btn').click(function(e){
+          e.preventDefault();
+          var role_id=$(e.currentTarget).data('role-id');
+          if(confirm('Delete this role?')){
+            $.post('/role/'+role_id,function(){
+              window.location.reload();
+            });
+          }
+        });
+    });
