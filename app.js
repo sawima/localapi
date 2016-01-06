@@ -19,9 +19,13 @@ var app =  express(),
     router = express.Router(),
     auth = require('./config/middlewares/authorization'),
     permission = require('./config/middlewares/permission'),
-    config=require('./config/config')
+    config=require('./config/config');
+
+
+var jwt=require('jsonwebtoken');
 
 app.locals._=require('lodash');
+app.set('superSecret', config.secret);
 
 mongoose.connect("mongodb://127.0.0.1:27017/mpsapi",{safe:true});
 
@@ -99,10 +103,105 @@ apirouter.use(function(req,res,next) {
  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
  next();
+});  
+
+var Requester = mongoose.model('Requester');
+
+
+apirouter.route('/setup').get(function(req,res) {
+    var nick = new Requester({ 
+      name: 'james', 
+      password: 'password',
+      admin: true 
+    });
+    nick.save(function(err) {
+      if (err) throw err;
+
+      console.log('User saved successfully');
+      res.json({ success: true });
+    });
+});
+
+apirouter.route('/auth').get(function(req,res) {
+    res.send(config.tokenSecret);
+  }).post(function(req,res) {
+      // find the user
+      console.log('get user and password from remote');
+      // console.log(req.body.username);
+      // console.log(req.body.password);
+      Requester.findOne({
+        name: req.body.username
+      }, function(err, user) {
+
+        if (err) throw err;
+
+        // console.log(user);
+
+        if (!user) {
+          res.json({ success: false, message: 'Authentication failed. User not found.' });
+        } else if (user) {
+
+          // check if password matches
+          //user.authenticate(password)
+          if (user.password!==req.body.password) {
+            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+          } else {
+
+            // if user is found and password is right
+            // create a token
+            var token = jwt.sign(user, config.tokenSecret, {
+              expiresInMinutes: 1440 // expires in 24 hours
+            });
+
+            // return the information including token as JSON
+            res.json({
+              success: true,
+              message: 'Enjoy your token!',
+              token: token
+            });
+          }   
+
+        }
+
+      });
+    });
+
+apirouter.use(function(req, res, next) {
+
+    // check header or url parameters or post parameters for token
+    var token = req.body.token || req.param('token') || req.headers['x-access-token'];
+
+    // decode token
+    if (token) {
+
+        // verifies secret and checks exp
+        jwt.verify(token, config.tokenSecret, function(err, decoded) {          
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });      
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;  
+                console.log(decoded);
+                next();
+            }
+        });
+
+    } else {
+
+        // if there is no token
+        // return an error
+        return res.status(403).send({ 
+            success: false, 
+            message: 'No token provided.'
+        });
+        
+    }
+    
 });
 
 
 require('./config/routers')(router,passport,auth,permission);
+require('./config/apirouters')(apirouter);
 
 app.use('/api',apirouter)
 app.use('/',router);
