@@ -1,6 +1,6 @@
 module.exports =  function(router,passport,auth,permission) {
 
-  // router.all('*',auth.requiresLogin);
+  router.all('*',auth.requiresLogin);
 
   //permission logic
   // router.use(/^\/(users|user|clients|client|roles|role|permits|permit|matrix)/,permission.userPermission);

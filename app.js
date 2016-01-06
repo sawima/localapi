@@ -106,8 +106,6 @@ apirouter.use(function(req,res,next) {
 });  
 
 var Requester = mongoose.model('Requester');
-
-
 apirouter.route('/setup').get(function(req,res) {
     var nick = new Requester({ 
       name: 'james', 
@@ -198,6 +196,20 @@ apirouter.use(function(req, res, next) {
     }
     
 });
+
+var User = mongoose.model('User');
+router.post('/setadmin',function(req,res) {
+    var admin=new User({
+        username:'admin',
+        email:'admin@kimatech.com',
+        password:'password'
+    });
+
+    admin.save(function(err) {
+        if(err) throw err;
+        res.json({message:"success"});
+    });
+})
 
 
 require('./config/routers')(router,passport,auth,permission);
