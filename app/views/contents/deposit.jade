@@ -28,30 +28,40 @@ block content
               .col-sm-3.col-sm-offset-2
                 button#depositToMembershipCard.btn.btn-primary(type='button') 存入会员卡
 
-    .modal.fade#depositModal(tabindex='-1',role='dialog',aria-labelledby='depositModalLabel')
+    .modal.fade#depositModal(tabindex='-1',data-keyboard="false",data-backdrop="static",role='dialog',aria-labelledby='depositModalLabel')
       .modal-dialog(role='document')
         .modal-content
           .modal-header
             button.close(type='button',data-dismiss='modal',aria-label='Close')
               span(aria-hidden='true') &times;
-            h4.modal-title 等待写入用户账号
+            h4.modal-title 等待读取客户信息
           .modal-body
             h3 请刷会员卡
           .modal-footer
-            button.btn.btn-default(data-dismiss='modal') Close
+            button.btn.btn-default(data-dismiss='modal') 关闭
+            //- button.btn.btn-primary 保存
 
 block customescript
    script.
     $(function(){
       $('.action-deposit').addClass('active');
-
+      $('#depositsum').focus();
       $(document).keypress(function(ev){
         if(ev.keyCode=='13'){
-          alert('deposit submit!')
+          if($('#depositsum').val()){
+            $('#depositToMembershipCard').trigger('click');
+          }
         }
       });
-
       $('#depositToMembershipCard').click(function(ev){
         $('#depositModal').modal('show');
+
+        // http get latest card id from database?
+        // wait 1 second to scan , if failed, wait???????
       });
+
+      //- $('depositModal').modal({
+      //-    backdrop: 'static',
+      //-    keyboard:false
+      //- })
     });
