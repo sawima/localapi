@@ -8,6 +8,32 @@ module.exports =  function(router,passport,auth,permission) {
   router.route('/').get(function(req,res) {
   	res.render('index');
   });
+
+  router.route('/consume').get(function(req,res) {
+    res.render('contents/consume')
+  });
+
+  router.route('/newmember').get(function(req,res) {
+    res.render('contents/newmember')
+  });
+
+  router.route('/deposit').get(function(req,res) {
+    res.render('contents/deposit')
+  });
+
+  router.route('/query').get(function(req,res) {
+    res.render('contents/query')
+  });
+
+  router.route('/coupons').get(function(req,res) {
+    res.render('contents/coupons')
+  });
+
+
+
+
+
+
   router.route('/applyaccount').get(function(req,res) {
     res.render('users/applyaccount');
   });

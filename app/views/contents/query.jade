@@ -1,0 +1,15 @@
+extends ../layouts/flat_template
+
+block content
+  .container.main-content
+    .row
+      .col-md-2
+        include ../includes/actionbuttons
+      .col-md-10.action-form
+        h2 Query
+
+block customescript
+   script.
+    $(function(){
+      $('.action-query').addClass('active');
+    });

@@ -1,0 +1,57 @@
+extends ../layouts/flat_template
+
+block content
+  .container.main-content
+    .row
+      .col-md-2
+        include ../includes/actionbuttons
+      .col-md-10.action-form
+        h2 充值优惠
+        .coupon-list-menu
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+          .coupon-item.rounded-3x
+
+        .devider.devider-dotted
+        .form-horizontal.margin-top-20
+            .form-group
+              label.control-label.col-sm-2(for='depositsum') 充值金额
+              .col-sm-3
+                input.form-control#depositsum(type='text',placeholder='充值金额')
+            .row
+              .col-sm-3.col-sm-offset-2
+                button#depositToMembershipCard.btn.btn-primary(type='button') 存入会员卡
+
+    .modal.fade#depositModal(tabindex='-1',role='dialog',aria-labelledby='depositModalLabel')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            button.close(type='button',data-dismiss='modal',aria-label='Close')
+              span(aria-hidden='true') &times;
+            h4.modal-title 等待写入用户账号
+          .modal-body
+            h3 请刷会员卡
+          .modal-footer
+            button.btn.btn-default(data-dismiss='modal') Close
+
+block customescript
+   script.
+    $(function(){
+      $('.action-deposit').addClass('active');
+
+      $(document).keypress(function(ev){
+        if(ev.keyCode=='13'){
+          alert('deposit submit!')
+        }
+      });
+
+      $('#depositToMembershipCard').click(function(ev){
+        $('#depositModal').modal('show');
+      });
+    });

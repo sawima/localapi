@@ -1,0 +1,132 @@
+/*.logobar {
+	height:70px;
+	width:100%;
+	padding: 10px;
+	background-color: grey;
+	display:flex;
+    display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-box;
+    display:-ms-flexbox;
+	flex-direction:row;
+    flex-wrap:nowrap;
+}
+
+.logobar .logo {
+	font-weight: bold;
+	flex:1;
+	flex-grow:1;
+}*/
+
+.logobar {
+	background-color: #80DAA1;
+	min-height: 50px;
+}
+
+.logobar .logo-link {
+	text-decoration: none;
+}
+
+.actionbtn-container {
+	display:flex;
+/*    display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-box;
+    display:-ms-flexbox;*/
+	flex-direction:column;
+    flex-wrap:nowrap;
+   	background-color: #FCFDFA;
+}
+
+.action-buttons {
+	margin:10px;
+}
+
+.action-buttons > a {
+	text-align: center;
+	display: block;
+	width: 90px;
+	height: 80px;
+
+	background-color: #DCDA93;
+	border: 0px solid #000000;
+}
+
+.action-buttons > a:hover{
+	text-decoration: none;
+	background-color: #F9D62D;
+	/*color: #7D0F4C;*/
+}
+
+.action-buttons > a.active{
+	text-decoration: none;
+	background-color: #F9D62D;
+}
+
+.action-buttons > a > h3 {
+	font-size: 19px;
+	font-weight: bold;
+	padding-top:26px;
+	/*color:#118C8C;*/
+	color: #7D0F4C;
+}
+
+/********consume form***********/
+.category-list {
+	display: flex;
+	flex-direction:row;
+	flex-wrap:wrap;
+	margin: 10px 0;
+}
+
+.category-list a.catetory-link {
+	width:80px;
+	height:50px;
+	background-color:#AFE4E2;
+	margin: 0 10px;
+	display: block;
+	text-align: center;
+	padding:15px;
+	text-decoration: none;
+}
+
+.category-list a.catetory-link:hover{
+	background-color: #E48051;
+}
+
+.category-list a.category-selected {
+	background-color: #E48051;
+	color: #fff;
+}
+
+/*********new member*************/
+
+.new-member-menu {
+	display: flex;
+	flex-direction:row;
+	flex-wrap:wrap;
+	margin: 10px 0;
+}
+
+.new-member-menu .new-member-event {
+	width: 120px;
+	height: 100px;
+	background-color: #BFD6AA;
+	margin: 10px 15px;
+}
+
+/*******deposit***********/
+
+.coupon-list-menu {
+	display: flex;
+	flex-direction:row;
+	flex-wrap:wrap;
+	margin: 10px 0;
+}
+
+.coupon-list-menu .coupon-item {
+	width: 120px;
+	height: 100px;
+	background-color: #BFD6AA;
+	margin: 10px 15px;
+}

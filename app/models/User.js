@@ -26,6 +26,10 @@ var UserSchema = new Schema({
         type:Boolean,
         default:true
     }
+    // store:{
+    //     type:Schema.ObjectId,
+    //     ref:'Store'
+    // }
 });
 
 

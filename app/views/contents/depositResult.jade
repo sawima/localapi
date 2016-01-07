@@ -1,0 +1,16 @@
+extends ../layouts/flat_template
+
+block content
+  .container.main-content
+    .row
+      .col-md-2
+        include ../includes/actionbuttons
+      .col-md-10.action-form
+        h2 充值结果
+        
+
+block customescript
+   script.
+    $(function(){
+      $('.action-deposit').addClass('active');
+    });
