@@ -36,10 +36,12 @@ block content
               span(aria-hidden='true') &times;
             h4.modal-title 等待读取客户信息
           .modal-body
-            h3 请刷会员卡
+            h3#notify_text_area
+            #meberInfoBox
+            input#notify_msg(type='text')
           .modal-footer
             button.btn.btn-default(data-dismiss='modal') 关闭
-            //- button.btn.btn-primary 保存
+            button.btn.btn-primary#saveDepositBtn 存入账号
 
 block customescript
    script.
@@ -53,15 +55,28 @@ block customescript
           }
         }
       });
+
+      $('#saveDepositBtn').hide();
+      $('#saveDepositBtn').click(function(){
+        alert('save to account');
+      });
+      
+
       $('#depositToMembershipCard').click(function(ev){
         $('#depositModal').modal('show');
-
-        // http get latest card id from database?
-        // wait 1 second to scan , if failed, wait???????
+          $('#notify_text_area').html('请刷会员卡..........');
+          $('#notify_msg').val("");
+        var prepareTime=Date.now();     
+        var scanTimer=setInterval(function(){
+          $.get("/api/getTargetCard",function(data){
+            if(data.scanat>prepareTime){
+              $('#notify_text_area').html('读取成功');
+              $('#meberInfoBox').html("用户姓名，账号余额，加值金额，赠送金额，手机号码。。。。")
+              $('#notify_msg').val(data.cardid);
+              clearInterval(scanTimer);
+              $('#saveDepositBtn').show();
+            }
+          });
+        },2000);
       });
-
-      //- $('depositModal').modal({
-      //-    backdrop: 'static',
-      //-    keyboard:false
-      //- })
     });

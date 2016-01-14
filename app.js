@@ -164,6 +164,59 @@ apirouter.route('/auth').get(function(req,res) {
       });
     });
 
+var ScanCard=mongoose.model('ScanCard');
+
+apirouter.route('/scancard').post(function(req,res) {
+    console.log(req.body.cardid,"-----",req.body.ipaddress);
+
+    // res.send({
+    //   cardid: req.body.cardid,
+    //   ipaddress:req.body.ipaddress
+    // })
+    //save to DB
+    var tcard=new ScanCard({
+      cardid: req.body.cardid,
+      ipaddress:req.body.ipaddress
+    });
+
+    // var tcard=new ScanCard({
+    //   cardid: "xxx",
+    //   ipaddress:"12.12.31..1"
+    // });
+
+    tcard.save(function(err) {
+      if(err) throw err;
+    });
+
+});
+
+// apirouter.route('/removeAllScanCard').post(function(req,res) {
+//   ScanCard.find({},function(err,docs) {
+//     if(err) throw err;
+//     docs.forEach(function(doc,index) {
+//       doc.remove();
+//     });
+//     console.log('in the post');
+//   });
+// });
+
+apirouter.route('/getTargetCard').get(function(req,res) {
+  ScanCard.findOne({},function(err,doc) {
+    if(err) throw err;
+    console.log('in the get');
+    console.log(doc);
+    if(doc){
+      res.json({
+        cardid:doc.cardid,
+        ipaddress:doc.ipaddress,
+        scanat:doc.scanat.getTime()
+      });
+    }    
+  });
+});
+
+
+
 apirouter.use(function(req, res, next) {
 
     // check header or url parameters or post parameters for token

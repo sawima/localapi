@@ -13,9 +13,11 @@ module.exports =  function(router,passport,auth,permission) {
     res.render('contents/consume')
   });
 
+
+  var MembershipCtl=require('../app/controllers/Membership');
   router.route('/newmember').get(function(req,res) {
     res.render('contents/newmember')
-  });
+  }).post(MembershipCtl.newMember);
 
   router.route('/deposit').get(function(req,res) {
     res.render('contents/deposit')
@@ -29,7 +31,7 @@ module.exports =  function(router,passport,auth,permission) {
     res.render('contents/coupons')
   });
 
-
+  
 
 
 
