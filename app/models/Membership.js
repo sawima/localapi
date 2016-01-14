@@ -12,7 +12,7 @@ var MembershipCardSchema = new Schema({
   // cardid:{type:String,required:true,unique:true},
   cardid:String,
   wechatid:String,
-  mobile:{type:String,required:true,unique:true},
+  mobile:{type:String,required:true},
   customerName:String,
   age:Number,
   gender:String,

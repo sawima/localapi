@@ -20,7 +20,7 @@ block content
             .form-group
               label.control-label.col-sm-2(for='customername') 姓名
               .col-sm-3
-                input.form-control#customername(type='text',name='customerName',placeholder='姓名')
+                input.form-control#customerName(type='text',name='customerName',placeholder='姓名')
             .form-group
               label.control-label.col-sm-2(for='mobile') 手机号码
               .col-sm-3
@@ -28,13 +28,22 @@ block content
             .form-group
               label.control-label.col-sm-2(for='customerage') 年龄
               .col-sm-3
-                input.form-control#customerage(type='text',name='age',placeholder='年龄')
+                input.form-control#cusomterAge(type='text',name='age',placeholder='年龄')
+            .form-group
+              label.control-label.col-sm-2 性别
+              .col-sm-3
+                label.radioLabel(for='Gmale')
+                  input(type='radio',id='Gmale',name='customerGender',value="男")
+                  | 男
+                label.radioLabel(for='Gfemale')
+                  input(type='radio',name='customerGender',value='女')
+                  | 女
             .form-group
               label.control-label.col-sm-2(for='depositsum') 充值金额
               .col-sm-3
-                input.form-control#depositsum(type='text',name='balance',placeholder='充值金额',required)
-                input(type='hidden',name='depositNumber')
-                input(type='hidden',name='donateNumber')
+                input.form-control#depositSum(type='text',name='balance',placeholder='充值金额',required)
+                input#depositNumber(type='hidden',name='depositNumber')
+                input#donateNumber(type='hidden',name='donateNumber')
             .row
               .col-sm-3.col-sm-offset-2
                 button.btn.btn-primary#createNewMemberCardBtn 制作会员卡
@@ -49,7 +58,7 @@ block content
           .modal-body
             h3#notify_text_area
             #meberInfoBox
-            input#notify_msg(type='text')
+            input#notify_msg(type='hidden')
           .modal-footer
             button.btn.btn-default(data-dismiss='modal') 关闭
             button.btn.btn-primary#createNewMemberBtn 创建新会员
@@ -69,24 +78,93 @@ block customescript
       }
      });
 
-
+      var newMemberData={};
       $('#createNewMemberBtn').hide();
       $('#createNewMemberBtn').click(function(){
-        alert('create New Member');
+        newMemberData.cardid=$('#notify_msg').val();
+        $.post('/newmember',newMemberData,function(data){
+          
+        });
+        $('#newMemberModal').modal('hide');
+
+        //clear the input fields
+        $('#customerName').val("");
+        $('#mobile').val("");
+        $('#cusomterAge').val("");
+        $('#depositSum').val("");
+        $('#depositNumber').val("");
+        $('#donateNumber').val("");
+        $("input:radio[name=customerGender]").prop('checked', false);
       });
       
+      $('#newMemberModal').on('hidden.bs.modal', function (e) {
+        $('#createNewMemberBtn').hide();
+      })
 
+      //get card info
       $('#createNewMemberCardBtn').click(function(ev){
         $('#newMemberModal').modal('show');
+        newMemberData={
+          customerName:$('#customerName').val(),
+          mobile:$('#mobile').val(),
+          age:$('#cusomterAge').val(),
+          gender:$('input:radio[name=customerGender]:checked').val(),
+          balance:$('#depositSum').val(),
+          cardid:"",
+          deposit:[{
+            //- amount:$('#depositNumber').val();
+            amount:$('#depositSum').val(),
+            donate:$('#donateNumber').val()
+          }]
+        };
           $('#notify_text_area').html('请刷会员卡..........');
           $('#notify_msg').val("");
+          var memberinfoHead="<div class='form-horizontal'>";
+          var memberinfoFoot="</div>";
+          var memberinfoColumn=function(indicator,mvalue){
+            var cnIndicator="";
+            switch(indicator) {
+              case "customerName":
+                  cnIndicator="用户姓名";
+                  break;
+              case "mobile":
+                  cnIndicator="手机号码";
+                  break;
+              case "age":
+                  cnIndicator="用户年龄";
+                  break;
+              case "gender":
+                  cnIndicator="用户性别";
+                  break;
+              case "balance":
+                  cnIndicator="充值金额";
+                  break;
+              default:
+                cnIndicator="";
+            };
+
+            if(cnIndicator){
+              return "<div class='form-group'><label class='col-sm-2 control-label'>"+cnIndicator+":</label><div class='col-sm-10'><p class='form-control-static'>"+mvalue+"</p></div></div>";
+            }
+            else{
+              return "";
+            }                
+          };
+
+          var memberinfo=memberinfoHead;
+
+          for(var mindex in newMemberData){
+            memberinfo=memberinfo+memberinfoColumn(mindex,newMemberData[mindex]);
+          }
+          memberinfo=memberinfo+memberinfoFoot;
+          $('#meberInfoBox').html(memberinfo);
         var prepareTime=Date.now();     
         var scanTimer=setInterval(function(){
           $.get("/api/getTargetCard",function(data){
             if(data.scanat>prepareTime){
-              $('#notify_text_area').html('读取成功');
-              $('#meberInfoBox').html("用户姓名，账号余额，加值金额，赠送金额，手机号码。。。。")
-              $('#notify_msg').val(data.cardid);
+              $('#notify_text_area').html('读卡成功');
+                $('#notify_msg').val(data.cardid);
+              //- newMemberData.cardid=data.cardid;
               clearInterval(scanTimer);
               $('#createNewMemberBtn').show();
             }

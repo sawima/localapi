@@ -8,4 +8,11 @@ exports.newMember = function(req,res) {
 	// 	mobile:req.body.mobile,
 
 	// })
+	console.log(req.body);
+
+	var member=new Membership(req.body);
+
+	member.save(function(err) {
+		if(err) throw err;
+	});
 };
