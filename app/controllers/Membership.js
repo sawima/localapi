@@ -14,5 +14,6 @@ exports.newMember = function(req,res) {
 
 	member.save(function(err) {
 		if(err) throw err;
+		res.send("ok");
 	});
 };
