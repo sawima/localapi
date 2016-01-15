@@ -186,6 +186,7 @@ apirouter.route('/scancard').post(function(req,res) {
 
     tcard.save(function(err) {
       if(err) throw err;
+      res.send("ok");
     });
 
 });
