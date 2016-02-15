@@ -1,328 +1,99 @@
 var express = require('express'),
     mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
     fs = require('fs'),
-    cookieParser = require('cookie-parser'),
     path = require('path'),
-    favicon = require('serve-favicon'),
-    bodyParser =  require('body-parser'),
-    expressValidator = require('express-validator'),
     logger = require('morgan'),
-    passport = require('passport'),
-    helpers = require('view-helpers'),
-    flash = require('express-flash'),
-    session = require('express-session'),
-    MongoStore = require('connect-mongo')(session),
-    methodOverride = require('method-override');
+    http = require('http');
 
 var app =  express(),
     apirouter=express.Router(),
-    router = express.Router(),
-    auth = require('./config/middlewares/authorization'),
-    permission = require('./config/middlewares/permission'),
     config=require('./config/config');
 
+var schedule = require('node-schedule');
 
-var jwt=require('jsonwebtoken');
+var tokenSchema = new Schema({
+  token:String
+});
 
-app.locals._=require('lodash');
-app.set('superSecret', config.secret);
+mongoose.model('Token', tokenSchema);
 
-mongoose.connect("mongodb://127.0.0.1:27017/mpsapi",{safe:true});
+var Token=mongoose.model('Token');
 
+
+var j = schedule.scheduleJob(config.scheduleStr, function(){
+  // console.log('The answer to life, the universe, and everything!');
+  //here is the cron task to update token
+  // http.get()
+
+  var postData = JSON.stringify({
+  'account' : 'sq',
+  'password' : 'password'
+  });
+
+  var options = {
+    hostname: config.centralServer,
+    port: config.centralServerPort,
+    path: config.centralServerPath,
+    method: 'POST',
+    headers: {
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
+      'Content-Length': postData.length
+    }
+  };
+
+  var req = http.request(options, (res) => {
+    console.log(`STATUS: ${res.statusCode}`);
+    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+    res.setEncoding('utf8');
+    res.on('data', (chunk) => {
+      // console.log(`BODY: ${chunk}`);
+      //save data to db
+      // console.log(chunk);
+      var getdata=JSON.parse(chunk);
+      var token = new Token({token:getdata.token});
+      token.save();
+    });
+    res.on('end', () => {
+      console.log('No more data in response.')
+    })
+  });
+
+  req.on('error', (e) => {
+    console.log(`problem with request: ${e.message}`);
+  });
+
+  req.write(postData);
+  req.end();
+
+});
+
+// mongoose.connect("mongodb://127.0.0.1:27017/mpstoken",{safe:true});
+mongoose.connect(config.db,{safe:true});
 
 app.use(logger('dev'));
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-// view engine setup
-app.set('views', path.join(__dirname, 'app/views'));
-app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-// method override 
-// input(type='hidden',name='_method',value='PUT')
-app.use(methodOverride(function(req, res){
-  if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-    // look in urlencoded POST bodies and delete it
-    var method = req.body._method
-    delete req.body._method
-    return method
-  }
-}));
-// app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(expressValidator());
-
-app.use(session({
-    secret: "Kima",
-    store: new MongoStore({
-      // url:process.env.MONGO_URL,
-      url:"mongodb://127.0.0.1:27017/mpsapi",
-      db : "sessions"
-    }),
-    saveUninitialized:true,
-    resave:true
-  }));
-app.use(flash());
-
-//Bootstrap models
-var models_path = __dirname+'/app/models';
-var walk = function(path) {
-    fs.readdirSync(path).forEach(function(file) {
-        var newPath = path + '/' + file;
-        var stat = fs.statSync(newPath);
-        if (stat.isFile()) {
-            if (/(.*)\.(js$|coffee$)/.test(file)) {
-                require(newPath);
-            }
-        } else if (stat.isDirectory()) {
-            walk(newPath);
-        }
-    });
-};
-walk(models_path);
-
-require('./config/passport')(passport);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(function(req, res, next) {
-  res.locals.user = req.user;
-  next();
-});
 
 
 //this part is for REST remote access
 apirouter.use(function(req,res,next) {
- res.header('Access-Control-Allow-Origin', '*');
+ // res.header('Access-Control-Allow-Origin', '*');
+ res.header('Access-Control-Allow-Origin', 'http"://127.0.0.1');
  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
  next();
 });  
 
-var Requester = mongoose.model('Requester');
-apirouter.route('/setup').get(function(req,res) {
-    var nick = new Requester({ 
-      name: 'james', 
-      password: 'password',
-      admin: true 
-    });
-    nick.save(function(err) {
-      if (err) throw err;
 
-      console.log('User saved successfully');
-      res.json({ success: true });
-    });
+
+apirouter.route('/gettoken').get(function(req,res) {
+  res.send('xxx');
 });
 
-apirouter.route('/auth').get(function(req,res) {
-    res.send(config.tokenSecret);
-  }).post(function(req,res) {
-      // find the user
-      console.log('get user and password from remote');
-      // console.log(req.body.username);
-      // console.log(req.body.password);
-      Requester.findOne({
-        name: req.body.username
-      }, function(err, user) {
+// require('./config/apirouters')(apirouter);
 
-        if (err) throw err;
-
-        // console.log(user);
-
-        if (!user) {
-          res.json({ success: false, message: 'Authentication failed. User not found.' });
-        } else if (user) {
-
-          // check if password matches
-          //user.authenticate(password)
-          if (user.password!==req.body.password) {
-            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-          } else {
-
-            // if user is found and password is right
-            // create a token
-            var token = jwt.sign(user, config.tokenSecret, {
-              expiresInMinutes: 1440 // expires in 24 hours
-            });
-
-            // return the information including token as JSON
-            res.json({
-              success: true,
-              message: 'Enjoy your token!',
-              token: token
-            });
-          }   
-
-        }
-
-      });
-    });
-
-var ScanCard=mongoose.model('ScanCard');
-
-apirouter.route('/scancard').post(function(req,res) {
-    console.log(req.body.cardid,"-----",req.body.ipaddress);
-
-    // res.send({
-    //   cardid: req.body.cardid,
-    //   ipaddress:req.body.ipaddress
-    // })
-    //save to DB
-    var tcard=new ScanCard({
-      cardid: req.body.cardid,
-      ipaddress:req.body.ipaddress
-    });
-
-    // var tcard=new ScanCard({
-    //   cardid: "xxx",
-    //   ipaddress:"12.12.31..1"
-    // });
-
-    tcard.save(function(err) {
-      if(err) throw err;
-      res.send("ok");
-    });
-
-});
-
-// apirouter.route('/removeAllScanCard').post(function(req,res) {
-//   ScanCard.find({},function(err,docs) {
-//     if(err) throw err;
-//     docs.forEach(function(doc,index) {
-//       doc.remove();
-//     });
-//     console.log('in the post');
-//   });
-// });
-
-apirouter.route('/getTargetCard').get(function(req,res) {
-  ScanCard.findOne({},function(err,doc) {
-    if(err) throw err;
-    console.log('in the get');
-    console.log(doc);
-    if(doc){
-      res.json({
-        cardid:doc.cardid,
-        ipaddress:doc.ipaddress,
-        scanat:doc.scanat.getTime()
-      });
-    }    
-  });
-});
-
-
-
-apirouter.use(function(req, res, next) {
-
-    // check header or url parameters or post parameters for token
-    var token = req.body.token || req.param('token') || req.headers['x-access-token'];
-
-    // decode token
-    if (token) {
-
-        // verifies secret and checks exp
-        jwt.verify(token, config.tokenSecret, function(err, decoded) {          
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });      
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;  
-                console.log(decoded);
-                next();
-            }
-        });
-
-    } else {
-
-        // if there is no token
-        // return an error
-        return res.status(403).send({ 
-            success: false, 
-            message: 'No token provided.'
-        });
-        
-    }
-    
-});
-
-var User = mongoose.model('User');
-router.post('/setadmin',function(req,res) {
-    var admin=new User({
-        username:'admin',
-        email:'admin@kimatech.com',
-        password:'password'
-    });
-
-    admin.save(function(err) {
-        if(err) throw err;
-        res.json({message:"success"});
-    });
-})
-
-
-require('./config/routers')(router,passport,auth,permission);
-require('./config/apirouters')(apirouter);
-
-app.use('/api',apirouter)
-app.use('/',router);
-
-
-// catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   var err = new Error('Not Found');
-//   err.status = 404;
-//   next(err);
-// });
-
-// error handlers
-
-// // development error handler
-// // will print stacktrace
-// if (app.get('env') === 'development') {
-//   app.use(function(err, req, res, next) {
-//     res.status(err.status || 500);
-//     res.render('error', {
-//       message: err.message,
-//       error: err
-//     });
-//   });
-// }
-
-// // production error handler
-// // no stacktraces leaked to user
-// app.use(function(err, req, res, next) {
-//   res.status(err.status || 500);
-//   res.render('error', {
-//     message: err.message,
-//     error: {}
-//   });
-// });
-
-// app.use(function(err, req, res, next) {
-//     //Treat as 404
-//     if (~err.message.indexOf('not found')) return next();
-
-//     //Log it
-//     console.error(err.stack);
-
-//     //Error page
-//     res.status(500).render('500', {
-//         error: err.stack
-//     });
-// });
-
-// //Assume 404 since no middleware responded
-// app.use(function(req, res, next) {
-//     res.status(404).render('404', {
-//         url: req.originalUrl,
-//         error: 'Not found'
-//     });
-// });
+app.use('/',apirouter);
 
 module.exports = app;
+
+

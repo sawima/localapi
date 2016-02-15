@@ -1,18 +1,13 @@
 var config=module.exports={};
 
-// config.marathon_master="172.21.100.221:8080";
-// config.username="ima";
-// config.password="ima"
+config.db=process.env.TOKEN_MONGO_URL || "mongodb://127.0.0.1:27017/mpstoken";
+config.account="sq";
+config.password="password";
+config.centralServer='127.0.0.1';
+config.centralServerPort=3000;
+config.centralServerPath="/api/auth";
+config.scheduleStr='*/1 * * * *';
+// config.updateIn=43200;
 
-config.mailgun={
-	api_key:"key-751478399dbedfd1eaa1bd824220eb4b",
-	domain:'mg.kimatech.com'
-}
 
-config.emailFrom="james@kimatech.com";
-
-config.app="MPSAPI";
-
-config.db=process.env.MONGO_URL || "mongodb://127.0.0.1:27017/mpsapi";
-
-config.tokenSecret="whatdoyousee";
+// config.tokenSecret="whatdoyousee";
