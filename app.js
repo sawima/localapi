@@ -87,8 +87,11 @@ apirouter.use(function(req,res,next) {
 
 
 apirouter.route('/gettoken').get(function(req,res) {
-  res.send('xxx');
-});
+  Token.findOne(function(err,token) {
+    if(err) throw err;
+    res.json({token:token.token});
+  });
+ });
 
 // require('./config/apirouters')(apirouter);
 
