@@ -18,10 +18,34 @@ var tokenSchema = new Schema({
 
 mongoose.model('Token', tokenSchema);
 
+mongoose.model('Store',new Schema({
+  storeId:String,
+  storeCode: String,
+  storeName:String,
+  storeNameCN:String
+}));
+
+mongoose.model('Coupon',new Schema({
+  name:String,
+  details:[{
+    depositNum:Number, 
+    grantNum:Number,
+    remark:String,
+    description:String,
+  }],
+  dtype:{     //新会员充值优惠或日常充值优惠
+    type:String,
+    enum:['newmember','deposit']
+  }
+}));
+
 var Token=mongoose.model('Token');
 
+var Store=mongoose.model('Store');
+var Coupon=mongoose.model('Coupon');
 
-var j = schedule.scheduleJob(config.scheduleStr, function(){
+
+var j = schedule.scheduleJob(config.scheduleTokenStr, function(){
   // console.log('The answer to life, the universe, and everything!');
   //here is the cron task to update token
   // http.get()

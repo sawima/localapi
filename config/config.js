@@ -6,7 +6,8 @@ config.password="password";
 config.centralServer='127.0.0.1';
 config.centralServerPort=3000;
 config.centralServerPath="/api/auth";
-config.scheduleStr='1 1 * * *';
+config.scheduleTokenStr='1 1 * * *';
+config.scheduleStoreStr='*/10 * * * *';
 // config.updateIn=43200;
 
 
