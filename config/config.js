@@ -7,8 +7,8 @@ config.centralServer='127.0.0.1';
 config.centralServerPort=3000;
 config.centralServerAuthPath="/api/auth";
 config.centralServerSyncPath="/api/sync";
-config.scheduleTokenStr='1 1 * * *';
-config.scheduleStoreStr='*/1 * * * *';
+config.scheduleTokenStr='* 1 * * *';
+config.scheduleStoreStr='* 2 * * *';
 // config.updateIn=43200;
 
 

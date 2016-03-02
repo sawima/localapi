@@ -14,7 +14,7 @@ var app =  express(),
 var schedule = require('node-schedule');
 
 var tokenSchema = new Schema({
-  token:String
+  mytoken:String
 // },{
 //   capped:{
 //     size:4096,
@@ -58,12 +58,7 @@ var Token=mongoose.model('Token');
 
 var Store=mongoose.model('Store');
 
-
-var j = schedule.scheduleJob(config.scheduleTokenStr, function(){
-  // console.log('The answer to life, the universe, and everything!');
-  //here is the cron task to update token
-  // http.get()
-
+var updateToken=function() {
   var postData = JSON.stringify({
   'account' : config.account,
   'password' : config.password
@@ -90,7 +85,7 @@ var j = schedule.scheduleJob(config.scheduleTokenStr, function(){
       //save data to db
       // console.log(chunk);
       var getdata=JSON.parse(chunk);
-      var token = new Token({token:getdata.token});
+      var token = new Token({mytoken:getdata.token});
       token.save();
     });
     res.on('end', () => {
@@ -104,67 +99,67 @@ var j = schedule.scheduleJob(config.scheduleTokenStr, function(){
 
   req.write(postData);
   req.end();
+};
 
+var j = schedule.scheduleJob(config.scheduleTokenStr, function(){
+  updateToken(); 
 });
 
-//sync store and coupons
-var jsync = schedule.scheduleJob(config.scheduleStoreStr, function(){
-  // console.log('The answer to life, the universe, and everything!');
-  //here is the cron task to update token
-  // http.get()
-
+var updateStoreInfo=function() {
   var postData = JSON.stringify({
   'account' : config.account,
   'password' : config.password
   });
+  Token.findOne({},function(err,token) {
+    if(err) throw err;
+    if(token){
+      var options = {
+        hostname: config.centralServer,
+        port: config.centralServerPort,
+        path: config.centralServerSyncPath+"/?token="+token.mytoken,
+        method: 'POST',
+        headers: {
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
+          'Content-Length': postData.length
+        }
+      };
+      var req = http.request(options, (res) => {
+        console.log(`STATUS: ${res.statusCode}`);
+        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+          // console.log(`BODY: ${chunk}`);
+          var getdata=JSON.parse(chunk);
 
-  //todo: promise get token
-  var token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NmM3ZDQyNjFiYjY4YWIwMzBhNDczMDEiLCJzdG9yZUNvZGUiOiJDTlNISjAwMSIsInN0b3JlTmFtZSI6IlJpdmVyIiwic3RvcmVOYW1lQ04iOiLmiZHlk6fot68iLCJzdG9yZVR5cGUiOiJEaXJlY3QiLCJsb2MiOltdLCJpYXQiOjE0NTY4ODk3MzcsImV4cCI6MTQ1Njk3NjEzN30.046URuZeS481yYWaf4F7MlnEJ2HwcvsemmKvFd4SS2E';
+          var store = new Store(getdata.store);
+          store.save();
+        });
+        res.on('end', () => {
+          console.log('No more data in response.')
+        })
+      });
 
-  var options = {
-    hostname: config.centralServer,
-    port: config.centralServerPort,
-    path: config.centralServerSyncPath+"/?token="+token,
-    method: 'POST',
-    // query:qs.stringify({token:token}),
-    headers: {
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Type': 'application/json',
-      'Content-Length': postData.length
+      req.on('error', (e) => {
+        console.log(`problem with request: ${e.message}`);
+      });
+
+      req.write(postData);
+      req.end();
     }
-  };
+  }); 
+};
 
-  var req = http.request(options, (res) => {
-    console.log(`STATUS: ${res.statusCode}`);
-    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-    res.setEncoding('utf8');
-    res.on('data', (chunk) => {
-      // console.log(`BODY: ${chunk}`);
-      //save data to db
-      // console.log(chunk);
-      var getdata=JSON.parse(chunk);
+updateToken();
 
-      console.log("(((((((((((((((((((((((((((((((((((((");
-      console.log(getdata.store);
-      var store = new Store(getdata.store);
-      // var coupons = new Store(getdata.store);
-      store.save();
-    });
-    res.on('end', () => {
-      console.log('No more data in response.')
-    })
-  });
+setTimeout(function(){
+  updateStoreInfo();
+}, 5000);
 
-  req.on('error', (e) => {
-    console.log(`problem with request: ${e.message}`);
-  });
-
-  req.write(postData);
-  req.end();
-
+//sync store and coupons
+var jsync = schedule.scheduleJob(config.scheduleStoreStr, function(){
+  updateStoreInfo();
 });
-
-
 
 // mongoose.connect("mongodb://127.0.0.1:27017/mpstoken",{safe:true});
 mongoose.connect(config.db,{safe:true});
@@ -174,8 +169,8 @@ app.use(logger('dev'));
 
 //this part is for REST remote access
 apirouter.use(function(req,res,next) {
- // res.header('Access-Control-Allow-Origin', '*');
- res.header('Access-Control-Allow-Origin', 'http"://127.0.0.1');
+ res.header('Access-Control-Allow-Origin', '*');
+ // res.header('Access-Control-Allow-Origin', 'http"://127.0.0.1');
  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
  next();
@@ -186,14 +181,14 @@ apirouter.use(function(req,res,next) {
 apirouter.route('/gettoken').get(function(req,res) {
   Token.findOne(function(err,token) {
     if(err) throw err;
-    res.json({token:token.token});
+    res.json({token:token.mytoken}); 
   });
  });
-
-// require('./config/apirouters')(apirouter);
 
 app.use('/',apirouter);
 
 module.exports = app;
+
+
 
 
