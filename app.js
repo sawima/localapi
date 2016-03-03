@@ -25,17 +25,12 @@ var tokenSchema = new Schema({
 mongoose.model('Token', tokenSchema);
 
 var CouponSchema ={
-  name:String,
   details:[{
     depositNum:Number, 
     grantNum:Number,
     remark:String,
     description:String,
-  }],
-  dtype:{     //新会员充值优惠或日常充值优惠
-    type:String,
-    enum:['newmember','deposit']
-  }
+  }] 
 };
 
 mongoose.model('Store',new Schema({
@@ -43,8 +38,22 @@ mongoose.model('Store',new Schema({
   storeCode: String,
   storeName:String,
   storeNameCN:String,
-  newMemberCoupon:CouponSchema,
-  depositCoupon:CouponSchema
+  newMemberCoupon:{
+    details:[{
+      depositNum:Number, 
+      grantNum:Number,
+      remark:String,
+      description:String,
+    }]
+  },
+  depositCoupon:{
+    details:[{
+      depositNum:Number, 
+      grantNum:Number,
+      remark:String,
+      description:String,
+    }]
+  }
 // },{
 //   capped:{
 //     size:4096,
@@ -77,19 +86,18 @@ var updateToken=function() {
   };
 
   var req = http.request(options, (res) => {
-    console.log(`STATUS: ${res.statusCode}`);
-    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+    // console.log(`STATUS: ${res.statusCode}`);
+    // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
     res.setEncoding('utf8');
+    var body="";
     res.on('data', (chunk) => {
-      // console.log(`BODY: ${chunk}`);
-      //save data to db
-      // console.log(chunk);
-      var getdata=JSON.parse(chunk);
-      var token = new Token({mytoken:getdata.token});
-      token.save();
+      body+=chunk;
     });
     res.on('end', () => {
-      console.log('No more data in response.')
+      var getdata=JSON.parse(body);
+      var token = new Token({mytoken:getdata.token});
+      token.save();
+      console.log('Get latest token.')
     })
   });
 
@@ -125,18 +133,21 @@ var updateStoreInfo=function() {
         }
       };
       var req = http.request(options, (res) => {
-        console.log(`STATUS: ${res.statusCode}`);
-        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+        // console.log(`STATUS: ${res.statusCode}`);
+        // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
         res.setEncoding('utf8');
+        var body="";
         res.on('data', (chunk) => {
-          // console.log(`BODY: ${chunk}`);
-          var getdata=JSON.parse(chunk);
-
-          var store = new Store(getdata.store);
-          store.save();
+          body+=chunk;
         });
         res.on('end', () => {
-          console.log('No more data in response.')
+          var getdata=JSON.parse(body);
+          var store = new Store(getdata.store);
+          console.log(store);
+          store.save(function(err) {
+            if(err) throw err;
+          });
+          console.log('Fresh new Store Info.')
         })
       });
 
@@ -150,16 +161,13 @@ var updateStoreInfo=function() {
   }); 
 };
 
-updateToken();
-
-setTimeout(function(){
-  updateStoreInfo();
-}, 5000);
-
 //sync store and coupons
 var jsync = schedule.scheduleJob(config.scheduleStoreStr, function(){
   updateStoreInfo();
 });
+
+updateToken();
+updateStoreInfo();
 
 // mongoose.connect("mongodb://127.0.0.1:27017/mpstoken",{safe:true});
 mongoose.connect(config.db,{safe:true});
