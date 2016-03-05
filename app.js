@@ -15,23 +15,9 @@ var schedule = require('node-schedule');
 
 var tokenSchema = new Schema({
   mytoken:String
-// },{
-//   capped:{
-//     size:4096,
-//     max:1
-//   }
 });
 
 mongoose.model('Token', tokenSchema);
-
-var CouponSchema ={
-  details:[{
-    depositNum:Number, 
-    grantNum:Number,
-    remark:String,
-    description:String,
-  }] 
-};
 
 mongoose.model('Store',new Schema({
   storeId:String,
@@ -125,11 +111,11 @@ var updateStoreInfo=function() {
         hostname: config.centralServer,
         port: config.centralServerPort,
         path: config.centralServerSyncPath+"/?token="+token.mytoken,
-        method: 'POST',
+        method: 'GET',
         headers: {
           // 'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Type': 'application/json',
-          'Content-Length': postData.length
+          'Content-Type': 'application/json'
+          // 'Content-Length': postData.length
         }
       };
       var req = http.request(options, (res) => {
@@ -155,7 +141,7 @@ var updateStoreInfo=function() {
         console.log(`problem with request: ${e.message}`);
       });
 
-      req.write(postData);
+      // req.write(postData);
       req.end();
     }
   }); 
@@ -169,7 +155,6 @@ var jsync = schedule.scheduleJob(config.scheduleStoreStr, function(){
 updateToken();
 updateStoreInfo();
 
-// mongoose.connect("mongodb://127.0.0.1:27017/mpstoken",{safe:true});
 mongoose.connect(config.db,{safe:true});
 
 app.use(logger('dev'));
