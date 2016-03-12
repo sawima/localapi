@@ -156,6 +156,10 @@ apirouter.use(function(req,res,next) {
 
 require('./config/routers')(apirouter);
 
+//getStoreInfo
+//getToken
+//getEvents
+
 app.use('/',apirouter);
 
 module.exports = app;
