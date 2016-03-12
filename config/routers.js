@@ -6,13 +6,13 @@ module.exports =  function(router) {
   router.route('/getToken').get(function(req,res) {
     Token.findOne(function(err,token) {
       if(err) throw err;
-      res.json({token:token.mytoken,timestamp:token.timestamp}); 
+      res.json({success:true,message:"get latest token",data:{token:token.mytoken,timestamp:token.timestamp}}); 
     });
   });
   router.route('/getStoreInfo').get(function(req,res) {
     Stores.findOne(function(err,store) {
       if(err) throw err;
-      res.json({store:store}); 
+      res.json({success:true,message:"get store and coupon info",data:{store:store}}); 
     });
   });
   router.route('/getEvents').get(function(req,res) {
@@ -38,7 +38,7 @@ module.exports =  function(router) {
         qrcode:"https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3851013351,2699800874&fm=58",
         picture:"http://db.kimacloud.com/images/store.jpg"
       }]
-      res.json({events:events}); 
+      res.json({success:true,message:"get latest events",data:{events:events}}); 
     // });
   });
 };
