@@ -16,8 +16,8 @@ module.exports =  function(router) {
     });
   });
   router.route('/getEvents').get(function(req,res) {
-    Events.findOne(function(err,token) {
-      if(err) throw err;
+    // Events.findOne(function(err,token) {
+    //   if(err) throw err;
       var events=[{
         title:"换季积分活动",
         description:"here is the events details",
@@ -39,6 +39,6 @@ module.exports =  function(router) {
         picture:"http://db.kimacloud.com/images/store.jpg"
       }]
       res.json({events:events}); 
-    });
+    // });
   });
 };
