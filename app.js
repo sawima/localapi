@@ -178,6 +178,10 @@ apirouter.route('/gettoken').get(function(req,res) {
   });
  });
 
+//getStoreInfo
+//getToken
+//getEvents
+
 app.use('/',apirouter);
 
 module.exports = app;
