@@ -1,13 +1,13 @@
 var config=module.exports={};
 
 config.db=process.env.TOKEN_MONGO_URL || "mongodb://127.0.0.1:27017/mpstoken";
-config.account="cnshMH002";
-config.password="z55zbur3sor";
-config.centralServer='127.0.0.1';
-config.centralServerPort=3000;
+config.account="CNSHMH001";
+config.password="0n41dtb7qfr";
+config.centralServer='db.kimacloud.com';
+config.centralServerPort=80;
 config.centralServerAuthPath="/api/auth";
 config.centralServerSyncPath="/api/sync";
-config.scheduleTokenStr='* */5 * * *';
+config.scheduleTokenStr='* */2 * * *';
 config.scheduleStoreStr='* */2 * * *';
 
 config.tokenSecret="everyonelovesspeedqueen";

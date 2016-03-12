@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
 
 
 var tokenSchema = new Schema({
-  mytoken:String
+  mytoken:String,
+  timestamp:{type:Date,default:new Date()}
 });
 
 mongoose.model('Token', tokenSchema);

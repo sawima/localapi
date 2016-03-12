@@ -11,7 +11,7 @@ var express = require('express'),
 var app =  express(),
     apirouter=express.Router(),
     config=require('./config/config');
-var jwt=require('jsonwebtoken');
+// var jwt=require('jsonwebtoken');
 
 var schedule = require('node-schedule');
 
@@ -154,80 +154,6 @@ apirouter.use(function(req,res,next) {
  next();
 });
 
-var Stores = mongoose.model('Store');
-apirouter.route('/auth').post(function(req,res){
-  Stores.
-    findOne({
-      account: req.body.account,
-    }).
-    exec(function(err,store){
-      if (err) throw err;
-      if (!store) {
-        res.json({ success: false, message: 'Authentication failed. store not found.' });
-      } else if (store) {
-        console.log(store);
-        // check if password matches
-        //store.authenticate(password)
-        // if (!store.authenticate(req.body.password)) {
-        if (store.syncpasswd!==req.body.password) {
-          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-        } else {
-
-          // if store is found and password is right
-          // create a token
-          var simpleStore=_.pick(store,['storeId','storeCode','storeName','storeNameCN']);
-          var token = jwt.sign(simpleStore, config.tokenSecret);
-          // var token = jwt.sign(simpleStore, config.tokenSecret, {
-          //   expiresIn: 8640000 // expires in 24*100 hours
-          // });
-
-          // return the information including token as JSON
-          res.json({
-            success: true,
-            message: 'Enjoy your token!',
-            token: token
-          });
-        }
-      }
-    });
-  });
-
-apirouter.use(function(req, res, next) {
-
-    // check header or url parameters or post parameters for token
-    // var token = req.body.token || req.param('token') || req.headers['x-access-token'];
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    // console.log(req.query.token);
-    // decode token
-    if (token) {
-
-        // verifies secret and checks exp
-        jwt.verify(token, config.tokenSecret, function(err, decoded) {          
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });      
-            } else {
-                // if everything is good, save to request for use in other routes
-                // req.decoded = decoded;  
-                req.store = decoded;  
-                next();
-            }
-        });
-
-    } else {
-        return res.status(403).send({ 
-            success: false, 
-            message: 'No token provided.'
-        });
-    }
-});
-
-
-// apirouter.route('/gettoken').get(function(req,res) {
-//   Token.findOne(function(err,token) {
-//     if(err) throw err;
-//     res.json({token:token.mytoken}); 
-//   });
-//  });
 require('./config/routers')(apirouter);
 
 app.use('/',apirouter);

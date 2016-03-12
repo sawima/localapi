@@ -7,8 +7,7 @@ var StoreSchema = new Schema({
   storeCode: String,
   storeName:String,
   storeNameCN:String,
-  account:String,
-  syncpasswd:String,
+  timestamp:{type:Date,default:new Date()},
   newMemberCoupon:[{
     depositNum:Number, 
     grantNum:Number,
