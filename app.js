@@ -11,7 +11,6 @@ var express = require('express'),
 var app =  express(),
     apirouter=express.Router(),
     config=require('./config/config');
-// var jwt=require('jsonwebtoken');
 
 var schedule = require('node-schedule');
 

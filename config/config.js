@@ -10,8 +10,4 @@ config.centralServerSyncPath="/api/sync";
 config.scheduleTokenStr='* */2 * * *';
 config.scheduleStoreStr='* */2 * * *';
 
-config.tokenSecret="everyonelovesspeedqueen";
-
-// config.updateIn=43200;
-
 
