@@ -6,12 +6,14 @@ module.exports =  function(router) {
   router.route('/getToken').get(function(req,res) {
     Token.findOne(function(err,token) {
       if(err) throw err;
+      res.set({ 'content-type': 'application/json; charset=utf-8' });
       res.json({success:true,message:"get latest token",data:{token:token.mytoken,timestamp:token.timestamp}}); 
     });
   });
   router.route('/getStoreInfo').get(function(req,res) {
     Stores.findOne(function(err,store) {
       if(err) throw err;
+      res.set({ 'content-type': 'application/json; charset=utf-8' });
       res.json({success:true,message:"get store and coupon info",data:{store:store}}); 
     });
   });
