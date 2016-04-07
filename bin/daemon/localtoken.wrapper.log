@@ -1,0 +1,9 @@
+2016-04-07 15:52:57 - Starting C:\Program Files\nodejs\node.exe --harmony "C:\Users\Kima\AppData\Roaming\nvm\v5.1.1\node_modules\qckwinsvc\node_modules\node-windows\lib\wrapper.js" -f "d:\james\mpstokenserver\bin\www" -l "localtoken" -g 0.25 -w 1 -r 3 -a n
+2016-04-07 15:52:57 - Started 14752
+2016-04-07 15:55:17 - Starting C:\Program Files\nodejs\node.exe --harmony "C:\Users\Kima\AppData\Roaming\nvm\v5.1.1\node_modules\qckwinsvc\node_modules\node-windows\lib\wrapper.js" -f "d:\james\mpstokenserver\bin\www" -l "localtoken" -g 0.25 -w 1 -r 3 -a n
+2016-04-07 15:55:17 - Started 320
+2016-04-07 15:55:36 - Stopping localtoken.exe
+2016-04-07 15:55:36 - ProcessKill 320
+2016-04-07 15:55:36 - Finished localtoken.exe
+2016-04-07 15:55:37 - Starting C:\Program Files\nodejs\node.exe --harmony "C:\Users\Kima\AppData\Roaming\nvm\v5.1.1\node_modules\qckwinsvc\node_modules\node-windows\lib\wrapper.js" -f "d:\james\mpstokenserver\bin\www" -l "localtoken" -g 0.25 -w 1 -r 3 -a n
+2016-04-07 15:55:37 - Started 14700
