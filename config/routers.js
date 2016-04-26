@@ -1,6 +1,7 @@
 var mongoose=require('mongoose');
 var Token=mongoose.model('Token');
 var Stores=mongoose.model('Store');
+var ScanCard=mongoose.model('ScanCard');
 
 module.exports =  function(router) {
   router.route('/getToken').get(function(req,res) {
@@ -41,11 +42,45 @@ module.exports =  function(router) {
       //   picture:"http://db.kimacloud.com/images/store.jpg"
       // }]
       var events=[
-        "http://db.kimacloud.com/images/newstore.png",
-        "http://db.kimacloud.com/images/softwash.png",
-        "http://db.kimacloud.com/images/family.png"
+        "http://mpsonline.sqstore.net/images/newstore.png",
+        "http:///mpsonline.sqstore.net/images/softwash.png",
+        "http:///mpsonline.sqstore.net/images/family.png"
       ]
       res.json({success:true,message:"get latest events",data:{events:events}}); 
     // });
   });
+
+
+  router.route('/scancard').post(function(req,res) {
+    console.log(req.body.cardid,"-----",req.body.ipaddress);
+    var tcard=new ScanCard({
+      cardid: req.body.cardid,
+      ipaddress:req.body.ipaddress
+    });
+    tcard.save(function(err) {
+      if(err) throw err;
+      res.send("ok");
+    });
+  });
+
+  router.route('/getTargetCard').get(function(req,res) {
+    ScanCard.findOne({},function(err,doc) {
+      if(err) throw err;
+      console.log('in the get');
+      console.log(doc);
+      if(doc){
+        res.json({
+          cardid:doc.cardid,
+          ipaddress:doc.ipaddress,
+          scanat:doc.scanat.getTime()
+        });
+      }    
+    });
+  });
+
+  router.route('/getServiceCategories').get(function(req,res) {
+    var serviceCategories=["洗涤","烘干","熨烫","去渍","代洗","精洗"];
+    res.json({success:true,message:"get service categories",data:{serviceCategories:serviceCategories}});
+  });
 };
+
