@@ -42,9 +42,9 @@ module.exports =  function(router) {
       //   picture:"http://db.kimacloud.com/images/store.jpg"
       // }]
       var events=[
-        "http://mpsonline.sqstore.net/images/newstore.png",
-        "http:///mpsonline.sqstore.net/images/softwash.png",
-        "http:///mpsonline.sqstore.net/images/family.png"
+        "http://mpsonline.sqstore.net/images/events/newstore.png",
+        "http://mpsonline.sqstore.net/images/events/softwash.png",
+        "http://mpsonline.sqstore.net/images/events/family.png"
       ]
       res.json({success:true,message:"get latest events",data:{events:events}}); 
     // });
