@@ -79,8 +79,10 @@ module.exports =  function(router) {
   });
 
   router.route('/getServiceCategories').get(function(req,res) {
-    var serviceCategories=["洗涤","烘干","熨烫","去渍","代洗","精洗"];
-    res.json({success:true,message:"get service categories",data:{serviceCategories:serviceCategories}});
+    var serviceCategories=["洗涤","烘干","熨烫","精洗","去渍","代洗","上门收送"];
+    res.json({success:true,message:"get service categories",data:serviceCategories});
   });
+
+
 };
 
